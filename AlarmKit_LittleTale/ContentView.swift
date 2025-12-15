@@ -67,7 +67,7 @@ extension ContentView {
                 }
             }
             
-            Button("??") {
+            Button("Count Down") {
                 Task {
                     try? await setAlarmWithCountDown()
                 }
