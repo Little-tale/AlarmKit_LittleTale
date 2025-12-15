@@ -30,6 +30,15 @@ struct ContentView: View {
         .task {
             store.send(.onAppear)
         }
+        .alert(store.state.alertMessage, isPresented: Binding(get: {
+            store.state.alertIsPresented
+        }, set: { value, t in
+            store.send(.alertIsPresented(value))
+        })) {
+            Button("OK") {
+                store.send(.alertIsPresented(false))
+            }
+        }
     }
 }
 
@@ -47,7 +56,20 @@ extension ContentView {
             
             Button("set Alarm") {
                 Task {
-                    try? await setAlarm()
+                    do{
+                        try await setAlarm()
+                    }catch{
+                        print(error.localizedDescription)
+                        if error.localizedDescription.contains("error 0"){
+                            store.send(.showAlert("You have to be louder than the current time."))
+                        }
+                    }
+                }
+            }
+            
+            Button("??") {
+                Task {
+                    try? await setAlarmWithCountDown()
                 }
             }
         }
@@ -74,6 +96,59 @@ extension ContentView {
         let schedule = Alarm.Schedule.fixed(store.state.scheduleDate)
         let config = AlarmManager.AlarmConfiguration(
             schedule: schedule,
+            attributes: attributed,
+            secondaryIntent: OpenAppIntents(id: id)
+        )
+        
+        let _ = try await AlarmManager.shared.schedule(id: id, configuration: config)
+        store.send(.showAlert(store.state.scheduleDate.description))
+        print(store.state.scheduleDate)
+        print("Success")
+    }
+    
+    
+    private func setAlarmWithCountDown() async throws {
+        let alert = AlarmPresentation.Alert(
+            title: "일어나",
+            secondaryButton: AlarmButton(
+                text: "repeat",
+                textColor: .blue,
+                systemImageName: "arrow.clockwise"
+            ),
+            secondaryButtonBehavior: .countdown
+        )
+        
+        let countDownDuration = Alarm.CountdownDuration(preAlert:  20, postAlert: 10)
+        
+        let countDownPresentation = AlarmPresentation.Countdown(
+            title: "10",
+            pauseButton: AlarmButton(
+                text: "pause",
+                textColor: .red,
+                systemImageName: "pause.fill"
+            ),
+        )
+        
+        let pausedPresentation =  AlarmPresentation.Paused(
+            title: "Pasued",
+            resumeButton: AlarmButton(
+                text: "resume",
+                textColor: .green,
+                systemImageName: "Play.fill"
+            )
+        )
+        
+        
+        let presentation = AlarmPresentation(alert: alert, countdown: countDownPresentation, paused: pausedPresentation)
+        
+        // 위는 UI 구성 요소
+        
+        let attributed = AlarmAttributes<CountDownAttribute>(presentation: presentation, metadata: CountDownAttribute(), tintColor: .orange)
+        
+        let id = UUID()
+        
+        let config = AlarmManager.AlarmConfiguration(
+            countdownDuration: countDownDuration,
             attributes: attributed,
             secondaryIntent: OpenAppIntents(id: id)
         )

@@ -54,6 +54,10 @@ public class MVIContainer<Intent: MVIIntent, State: MVIState, Effect: MVIEffect>
     public func emit(_ effect: Effect) {
         effectSubject.send(effect)
     }
+    
+    deinit {
+        print(#file, #function, #line, "-deinit")
+    }
 }
 
 // MARK: - 샘플 템플릿
