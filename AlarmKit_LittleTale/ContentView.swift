@@ -130,7 +130,7 @@ extension ContentView {
         )
         
         let pausedPresentation =  AlarmPresentation.Paused(
-            title: "Pasued",
+            title: "Paused",
             resumeButton: AlarmButton(
                 text: "resume",
                 textColor: .green,
