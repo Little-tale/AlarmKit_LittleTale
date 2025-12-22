@@ -88,7 +88,7 @@ extension ContentView {
         // 위는 UI 구성 요소
         let presentation = AlarmPresentation(alert: alert)
         
-        let attributed = AlarmAttributes<CountDownAttribute>(presentation: presentation, metadata: CountDownAttribute(), tintColor: .orange)
+        let attributed = AlarmAttributes<MyAlarmMetaData>(presentation: presentation, metadata: MyAlarmMetaData(method: .wakeUp), tintColor: .orange)
         
         let id = UUID()
         
@@ -117,11 +117,11 @@ extension ContentView {
             ),
             secondaryButtonBehavior: .countdown
         )
-        
-        let countDownDuration = Alarm.CountdownDuration(preAlert:  20, postAlert: 10)
+        // 시작값 10 초 -> 다시하기 하면 10
+        let countDownDuration = Alarm.CountdownDuration(preAlert: 10, postAlert: 10)
         
         let countDownPresentation = AlarmPresentation.Countdown(
-            title: "10",
+            title: "10Sec",
             pauseButton: AlarmButton(
                 text: "pause",
                 textColor: .red,
@@ -143,7 +143,7 @@ extension ContentView {
         
         // 위는 UI 구성 요소
         
-        let attributed = AlarmAttributes<CountDownAttribute>(presentation: presentation, metadata: CountDownAttribute(), tintColor: .orange)
+        let attributed = AlarmAttributes<MyAlarmMetaData>(presentation: presentation, metadata: MyAlarmMetaData(method: .wakeUp), tintColor: .orange)
         
         let id = UUID()
         
